@@ -25,7 +25,7 @@ remote_file "#{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]}
   not_if { ::File.exists?("#{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]}.tar.gz") }
 end
 
-execute "Extract Sphinx source" do
+bash "Extract Sphinx source" do
   cwd Chef::Config[:file_cache_path]
   
   sphinx_path = "#{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]}"

@@ -24,11 +24,18 @@ remote_file "#{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]}
   source node[:sphinx][:url]
   not_if { ::File.exists?("#{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]}.tar.gz") }
 end
- 
+
 execute "Extract Sphinx source" do
-  cwd "/tmp"
-  command "tar -zxvf #{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]}.tar.gz"
-  not_if { ::File.exists?("#{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]}") }
+  cwd Chef::Config[:file_cache_path]
+  
+  sphinx_path = "#{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]}"
+  
+  code <<-EOH
+    tar -zxvf #{sphinx_path}.tar.gz
+    if test -e #{sphinx_path}-release; then mv #{sphinx_path}-release #{sphinx_path}; fi;
+  EOH
+
+  not_if { ::File.exists?(sphinx_path) }
 end
  
 if node[:sphinx][:use_stemmer] 

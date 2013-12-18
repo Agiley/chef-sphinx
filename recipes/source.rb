@@ -22,6 +22,7 @@ include_recipe "postgresql::client" if node[:sphinx][:use_postgres]
  
 remote_file "#{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]}.tar.gz" do
   source node[:sphinx][:url]
+  mode      "0644"
   not_if { ::File.exists?("#{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]}.tar.gz") }
 end
 
@@ -41,6 +42,7 @@ end
 if node[:sphinx][:use_stemmer] 
   remote_file "#{Chef::Config[:file_cache_path]}/libstemmer_c.tgz" do
     source node[:sphinx][:stemmer_url]
+    mode      "0644"
     not_if { ::File.exists?("#{Chef::Config[:file_cache_path]}/libstemmer_c.tgz") }
   end
  

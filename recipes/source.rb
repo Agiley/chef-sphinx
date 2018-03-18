@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 include_recipe "build-essential"
-include_recipe "mysql::client"      if node[:sphinx][:use_mysql]
-include_recipe "postgresql::client" if node[:sphinx][:use_postgres]
  
 remote_file "#{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]}.tar.gz" do
   source node[:sphinx][:url]

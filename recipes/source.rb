@@ -50,6 +50,7 @@ node[:sphinx][:binaries].each do |binary|
 end
 
 directory download_path do
+  recursive true
   action    :delete
   only_if { ::File.exists?(download_path) }
 end

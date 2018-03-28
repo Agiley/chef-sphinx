@@ -1,8 +1,6 @@
 #
 # Cookbook Name:: sphinx
-# Recipe:: default
-#
-# Copyright 2010, Alex Soto <apsoto@gmail.com>
+# Recipe:: source
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,46 +15,56 @@
 # limitations under the License.
 #
 include_recipe "build-essential"
- 
-remote_file "#{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]}.tar.gz" do
+
+download_path     =   "#{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]}"
+download_file     =   "#{download_path}.tar.gz"
+
+remote_file download_file do
   source node[:sphinx][:url]
   mode      "0644"
-  not_if { ::File.exists?("#{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]}.tar.gz") }
+  not_if { ::File.exists?(download_file) }
 end
 
 bash "Extract Sphinx source" do
   cwd Chef::Config[:file_cache_path]
   
-  sphinx_path = "#{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]}"
-  
   code <<-EOH
-    tar -zxvf #{sphinx_path}.tar.gz
-    if test -e #{sphinx_path}-release; then mv #{sphinx_path}-release #{sphinx_path}; fi;
+    tar -zxvf #{download_path}.tar.gz
   EOH
 
-  not_if { ::File.exists?(sphinx_path) }
+  not_if { ::File.exists?(download_path) }
 end
- 
-if node[:sphinx][:use_stemmer] 
-  remote_file "#{Chef::Config[:file_cache_path]}/libstemmer_c.tgz" do
+
+if node[:sphinx][:use_stemmer]
+  stemmer_file = "#{Chef::Config[:file_cache_path]}/libstemmer_c.tgz"
+  
+  remote_file stemmer_file do
     source node[:sphinx][:stemmer_url]
     mode      "0644"
-    not_if { ::File.exists?("#{Chef::Config[:file_cache_path]}/libstemmer_c.tgz") }
+    not_if { ::File.exists?(stemmer_file) }
   end
  
   execute "Extract libstemmer source" do
     cwd Chef::Config[:file_cache_path]
-    command "tar -C #{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]} -zxf libstemmer_c.tgz"
-    not_if { ::File.exists?("#{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]}/libstemmer_c/src_c") }
+    command "tar -C #{download_path} -zxf libstemmer_c.tgz"
+    not_if { ::File.exists?("#{download_path}/libstemmer_c/src_c") }
   end
 end
- 
+
 bash "Build and Install Sphinx Search" do
-  cwd "#{Chef::Config[:file_cache_path]}/sphinx-#{node[:sphinx][:version]}"
+  cwd download_path
+  
   code <<-EOH
     ./configure #{node[:sphinx][:configure_flags].join(" ")}
     make
     make install
   EOH
+  
   not_if { ::File.exists?("/usr/local/bin/searchd") }
+end
+
+directory download_path do
+  recursive true
+  action    :delete
+  only_if { ::File.exists?(download_path) }
 end

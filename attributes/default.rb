@@ -1,6 +1,8 @@
 default[:sphinx][:install_path]     =   "/opt/sphinx"
-default[:sphinx][:version]          =   '2.1.4'
-default[:sphinx][:url]              =   "http://sphinxsearch.com/files/sphinx-#{sphinx[:version]}-release.tar.gz"
+
+default[:sphinx][:version]          =   '2.3.2-beta'
+default[:sphinx][:url]              =   "http://sphinxsearch.com/files/sphinx-#{sphinx[:version]}.tar.gz"
+
 default[:sphinx][:stemmer_url]      =   "http://snowball.tartarus.org/dist/libstemmer_c.tgz"
 
 # tunable options
@@ -9,9 +11,7 @@ default[:sphinx][:use_mysql]        =   true
 default[:sphinx][:use_postgres]     =   false
 
 default[:sphinx][:configure_flags]  =   [
-  "#{sphinx[:use_stemmer]   ? '--with-stemmer'  : '--without-stemmer'}",
-  "#{sphinx[:use_mysql]     ? '--with-mysql'    : '--without-mysql'}",
-  "#{sphinx[:use_postgres]  ? '--with-pgsql'    : '--without-pgsql'}"
+  "#{node[:sphinx][:use_stemmer]   ? '--with-stemmer'  : '--without-stemmer'}",
+  "#{node[:sphinx][:use_mysql]     ? '--with-mysql'    : '--without-mysql'}",
+  "#{node[:sphinx][:use_postgres]  ? '--with-pgsql'    : '--without-pgsql'}"
 ]
-
-

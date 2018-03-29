@@ -11,7 +11,7 @@ default[:sphinx][:use_mysql]        =   true
 default[:sphinx][:use_postgres]     =   false
 
 default[:sphinx][:configure_flags]  =   [
-  "#{node[:sphinx][:use_stemmer]   ? '--with-stemmer'  : '--without-stemmer'}",
-  "#{node[:sphinx][:use_mysql]     ? '--with-mysql'    : '--without-mysql'}",
-  "#{node[:sphinx][:use_postgres]  ? '--with-pgsql'    : '--without-pgsql'}"
-]
+  "#{node[:sphinx][:use_stemmer]  ? '--with-libstemmer' : ''}",
+  "#{node[:sphinx][:use_mysql]    ? '--with-mysql'      : ''}",
+  "#{node[:sphinx][:use_postgres] ? '--with-pgsql'      : ''}"
+].reject { |conf_flag| conf_flag.empty? }
